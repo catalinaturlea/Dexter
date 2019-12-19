@@ -21,8 +21,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
+import android.widget.TextView;
+
+import com.karumi.dexter.R;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 
 /**
@@ -37,6 +42,8 @@ public class SnackbarOnDeniedPermissionListener extends BasePermissionListener {
   private final View.OnClickListener onButtonClickListener;
   private final Snackbar.Callback snackbarCallback;
   private final int duration;
+  private int textColor;
+  private int backgroundColor;
 
   /**
    * @param view The view to find a parent from
@@ -46,13 +53,16 @@ public class SnackbarOnDeniedPermissionListener extends BasePermissionListener {
    */
   private SnackbarOnDeniedPermissionListener(View view, String text, String buttonText,
       View.OnClickListener onButtonClickListener, Snackbar.Callback snackbarCallback,
-      int duration) {
+      int duration, int textColor, int backgroundColor) {
     this.view = view;
     this.text = text;
     this.buttonText = buttonText;
     this.onButtonClickListener = onButtonClickListener;
     this.snackbarCallback = snackbarCallback;
     this.duration = duration;
+    this.textColor = textColor;
+    this.backgroundColor = backgroundColor;
+
   }
 
   @Override public void onPermissionDenied(PermissionDeniedResponse response) {
@@ -65,6 +75,8 @@ public class SnackbarOnDeniedPermissionListener extends BasePermissionListener {
     if (snackbarCallback != null) {
       snackbar.addCallback(snackbarCallback);
     }
+    snackbar.getView().setBackgroundColor(backgroundColor);
+    ((TextView)snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text)).setTextColor(textColor);
     snackbar.show();
   }
 
@@ -79,6 +91,8 @@ public class SnackbarOnDeniedPermissionListener extends BasePermissionListener {
     private View.OnClickListener onClickListener;
     private Snackbar.Callback snackbarCallback;
     private int duration = Snackbar.LENGTH_LONG;
+    private int textColor;
+    private int backgroundColor;
 
     private Builder(View view, String text) {
       this.view = view;
@@ -87,6 +101,15 @@ public class SnackbarOnDeniedPermissionListener extends BasePermissionListener {
 
     public static Builder with(View view, String text) {
       return new Builder(view, text);
+    }
+
+    public static Builder with(View view, String text, int textColor, int backgroundColor) {
+      Builder builder = new Builder(view, text);
+
+      builder.textColor = textColor;
+      builder.backgroundColor = backgroundColor;
+
+      return builder;
     }
 
     public static Builder with(View view, @StringRes int textResourceId) {
@@ -156,7 +179,7 @@ public class SnackbarOnDeniedPermissionListener extends BasePermissionListener {
      */
     public SnackbarOnDeniedPermissionListener build() {
       return new SnackbarOnDeniedPermissionListener(view, text, buttonText, onClickListener,
-          snackbarCallback, duration);
+          snackbarCallback, duration, textColor, backgroundColor);
     }
   }
 }

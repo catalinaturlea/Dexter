@@ -23,6 +23,8 @@ import android.provider.Settings;
 import androidx.annotation.StringRes;
 import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
+import android.widget.TextView;
+
 import com.karumi.dexter.MultiplePermissionsReport;
 
 /**
@@ -38,6 +40,8 @@ public class SnackbarOnAnyDeniedMultiplePermissionsListener
   private final View.OnClickListener onButtonClickListener;
   private final Snackbar.Callback snackbarCallback;
   private final int duration;
+  private int textColor;
+  private int backgroundColor;
 
   /**
    * @param view The view to find a parent from
@@ -47,13 +51,15 @@ public class SnackbarOnAnyDeniedMultiplePermissionsListener
    */
   private SnackbarOnAnyDeniedMultiplePermissionsListener(View view, String text,
       String buttonText, View.OnClickListener onButtonClickListener,
-      Snackbar.Callback snackbarCallback, int duration) {
+      Snackbar.Callback snackbarCallback, int duration, int textColor, int backgroundColor) {
     this.view = view;
     this.text = text;
     this.buttonText = buttonText;
     this.onButtonClickListener = onButtonClickListener;
     this.snackbarCallback = snackbarCallback;
     this.duration = duration;
+    this.textColor = textColor;
+    this.backgroundColor = backgroundColor;
   }
 
   @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
@@ -72,6 +78,8 @@ public class SnackbarOnAnyDeniedMultiplePermissionsListener
     if (snackbarCallback != null) {
       snackbar.addCallback(snackbarCallback);
     }
+    snackbar.getView().setBackgroundColor(backgroundColor);
+    ((TextView)snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text)).setTextColor(textColor);
     snackbar.show();
   }
 
@@ -86,6 +94,8 @@ public class SnackbarOnAnyDeniedMultiplePermissionsListener
     private View.OnClickListener onClickListener;
     private Snackbar.Callback snackbarCallback;
     private int duration = Snackbar.LENGTH_LONG;
+    private int textColor;
+    private int backgroundColor;
 
     private Builder(View view, String text) {
       this.view = view;
@@ -94,6 +104,15 @@ public class SnackbarOnAnyDeniedMultiplePermissionsListener
 
     public static Builder with(View view, String text) {
       return new Builder(view, text);
+    }
+
+    public static Builder with(View view, String text, int textColor, int backgroundColor) {
+      Builder builder = new Builder(view, text);
+
+      builder.textColor = textColor;
+      builder.backgroundColor = backgroundColor;
+
+      return builder;
     }
 
     public static Builder with(View view, @StringRes int textResourceId) {
@@ -160,7 +179,7 @@ public class SnackbarOnAnyDeniedMultiplePermissionsListener
      */
     public SnackbarOnAnyDeniedMultiplePermissionsListener build() {
       return new SnackbarOnAnyDeniedMultiplePermissionsListener(view, text, buttonText,
-          onClickListener, snackbarCallback, duration);
+          onClickListener, snackbarCallback, duration, textColor, backgroundColor);
     }
   }
 }
